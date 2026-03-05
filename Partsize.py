@@ -32,6 +32,16 @@ Output:
     Beispiel: NEED_DOE_Probe5000.jpg ist das beispiel mit 50% Mischdauer
                             5011 mit 100% Mischdauer
                             5022 mit 200% Mischdauer
+
+
+    Das environment einfach erzeugen mit:
+    conda create -n messvorschrift python=3.14
+    conda activate messvorschrift
+    pip install opencv-python numpy matplotlib seaborn scikit-learn
+    -> python Partsize.py
+
+
+
 """
 
 import cv2
