@@ -26,6 +26,12 @@ Processing pipeline:
 Output:
     - GMM segmentation image  → images/GMM_Segmentierung_Probe{N}.png
     - Streak distribution plot → images/Streifenverteilung_Probe{N}.png
+
+
+
+    Beispiel: NEED_DOE_Probe5000.jpg ist das beispiel mit 50% Mischdauer
+                            5011 mit 100% Mischdauer
+                            5022 mit 200% Mischdauer
 """
 
 import cv2
@@ -40,8 +46,7 @@ from sklearn.mixture import GaussianMixture
 # =============================================================================
 
 # Which probe (sample) to analyze — change this to process a different image
-PROBE_NUMBER = "5022"
-
+PROBE_NUMBER = "5000"
 # Paths
 DATA_FOLDER = "./data/"
 OUTPUT_FOLDER = "./images/"
@@ -284,7 +289,7 @@ def segment_streaks_gmm(roi_image):
         Binary image (uint8) where 255 = streak, 0 = background.
     """
     hsv = cv2.cvtColor(roi_image, cv2.COLOR_BGR2HSV)
-    v_channel = hsv[:, :, 2]  # Brightness channel
+    v_channel = hsv[:, :, 2]
 
     pixel_values = v_channel.reshape(-1, 1)
     gmm = GaussianMixture(n_components=2, random_state=0)
@@ -292,10 +297,11 @@ def segment_streaks_gmm(roi_image):
 
     labels = gmm.predict(pixel_values).reshape(v_channel.shape)
 
-    # The cluster with the lower mean brightness is the streak cluster
-    # (particles are darker than the groove background)
-    streak_label = 0 if gmm.means_[0] < gmm.means_[1] else 1
-    binary = np.where(labels == streak_label, 255, 0).astype(np.uint8)
+    # Alte (korrekte) Logik: wenn means_[0] < means_[1], dann ist Label 1 der Streifen
+    if gmm.means_[0] < gmm.means_[1]:
+        binary = np.where(labels == 1, 255, 0).astype(np.uint8)
+    else:
+        binary = np.where(labels == 0, 255, 0).astype(np.uint8)
 
     return binary
 
